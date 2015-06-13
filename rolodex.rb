@@ -13,6 +13,8 @@ class Rolodex
     add_contact(first_name: "Peter", last_name: "Griffin", email: "peter@griffin.com", notes: "Family Guy")
     add_contact(first_name: "Tony", last_name: "Soprano", email: "tony@soprano.com", notes: "King of New Jersey")
     add_contact(first_name: "Fred", last_name: "Flintstone", email: "yaba@daba.do", notes: "Prehistoric")
+    add_contact(first_name: "Michael", last_name: "Jones", email: "michael@jones.com", notes: "This is not me.")
+    add_contact(first_name: "Mike", last_name: "Fich", email: "michaelfich@outlook.com", notes: "This is another me.")
   end
 
   def add_contact(input)
@@ -26,18 +28,20 @@ class Rolodex
     @contacts.each do |contact|
       if contact.id == id
         case key
-        when :first_name then contact.first_name = value
-        when :last_name then contact.last_name = value
-        when :email then contact.email = value
+        when :first_name then contact.first_name = value.capitalize
+        when :last_name then contact.last_name = value.capitalize
+        when :email then contact.email = value.downcase
         when :notes then contact.notes = value
         end
       end
     end
   end
 
-  def display_all_contacts
-    @contacts.each do |contact|
-      contact.display
+  def display_contacts(contacts=nil)
+    if contacts
+      return contacts.each { |contact| contact.display }
+    else
+      return @contacts.each { |contact| contact.display }
     end
   end
 
@@ -45,20 +49,30 @@ class Rolodex
     @contacts.each do |contact|
       if contact.id == id
         contact.display
-        return
+        return contact
       end
     end
   end
 
-  def display_info_by_attribute
+  def display_info_by_attribute(attribute, value)
+    contacts = []
 
+    if attribute == :first_name
+      contacts = @contacts.select { |contact| contact.first_name == value }
+    elsif attribute == :last_name
+      contacts = @contacts.select { |contact| contact.last_name == value }
+    elsif attribute == :email
+      contacts = @contacts.select { |contact| contact.email == value }
+    elsif attribute == :notes
+      contacts = @contacts.select { |contact| contact.notes == value }
+    end
+
+    display_contacts(contacts)
   end
 
   def delete_contact(id)
-    @contacts.each do |contact|
-      if contact.id == id
-        @contacts.delete(contact)
-      end
+    @contacts.delete_if do |contact|
+      contact.id == id
     end
   end
 

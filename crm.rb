@@ -26,11 +26,12 @@ class CRM
 
   def call_option(choice)
     case choice
-    when 1
-      add_contact
-      puts "Contact added!"
+    when 1 then add_contact
     when 2 then edit_contact
-    when 3 then delete_contact
+    when 3
+      puts "Delete a contact."
+      delete_contact
+      puts "Contacted deleted."
     when 4 then display_contacts
     when 5 then display_contact
     when 6 then display_attribute
@@ -42,7 +43,7 @@ class CRM
     end
   end
 
-  def print_update_menu
+  def print_contact_menu
     puts "[1] First name"
     puts "[2] Last name"
     puts "[3] Email address"
@@ -60,8 +61,6 @@ class CRM
 
       clear
 
-      return if input == 6
-
       call_option(input)
 
       puts ""
@@ -75,16 +74,13 @@ class CRM
   end
 
   def edit_contact
-    print "Enter the ID of the contact to be edited: "
-    id = gets.chomp.to_i
-
-    @rolodex.display_contact_by_id(id)
+    contact = display_contact
 
     print "Is this the contact that you wish to edit [yes/no]: "
     confirm = gets.chomp.downcase
 
     if confirm == "yes" || confirm == "y"
-      print_update_menu
+      print_contact_menu
 
       print "Which option did you want to update [1-4]: "
       key = gets.chomp.to_i
@@ -94,30 +90,64 @@ class CRM
         print "Enter the new first name: "
       elsif key == 2
         key = :last_name
-        print "Enter the new last name"
+        print "Enter the new last name: "
       elsif key == 3
         key = :email
         print "Enter the new email address: "
       elsif key == 4
         key = :notes
-        print "Enter the new notes:"
+        print "Enter the new notes: "
       end
 
       value = gets.chomp
 
-      @rolodex.modify_contact(id, key, value)
+      @rolodex.modify_contact(contact.id, key, value)
     end
   end
 
+  def delete_contact
+    contact = display_contact
+    @rolodex.delete_contact(contact.id)
+  end
+
   def display_contacts
-    @rolodex.display_all_contacts
+    clear
+    @rolodex.display_contacts
   end
 
   def display_contact
-    print "Enter the ID of the contat you want to display: "
+    print "Enter the ID of the contact: "
     id = gets.chomp.to_i
 
     @rolodex.display_contact_by_id(id)
+  end
+
+  def display_attribute
+    print_contact_menu
+
+      print "Which option would you like to select [1-4]: "
+      attribute = gets.chomp.to_i
+
+      case attribute
+      when 1
+        key = :first_name
+        print "Enter first name: "
+      when 2
+        key = :last_name
+        print "Enter last name: "
+      when 3
+        key = :email
+        print "Enter email address: "
+      when 4
+        key = :notes
+        print "Enter notes: "
+      end
+
+      value = gets.chomp
+
+      clear
+
+      contacts = @rolodex.display_info_by_attribute(key, value)
   end
 
   def get_user_input
